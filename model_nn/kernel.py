@@ -33,7 +33,6 @@ def start(I,H,Out):
             
 def W_dW(I,H,Out):
     Od = (I.flg_fraud-Out[0])*((1-Out[0])*Out[0])
-    Ograd = [el*Od for el in H]
     Hd = []
     Ow = WeightNN.objects.get(id = 11)
     Hd.append(((1-H[0])*H[0])*(Ow.w1*Od))
@@ -51,20 +50,20 @@ def W_dW(I,H,Out):
     for w in WeightNN.objects.all().order_by('id'):
         b = BiasNN.objects.get(id = w.id)
         if w.id == 11:
-            b.w0 = E*w.w0*Od + b.w0*A
-            b.w1 = E*Ograd[0] + b.w1*A
-            b.w2 = E*Ograd[1] + b.w2*A
-            b.w3 = E*Ograd[2] + b.w3*A
-            b.w4 = E*Ograd[3] + b.w4*A
-            b.w5 = E*Ograd[4] + b.w5*A
-            b.w6 = E*Ograd[5] + b.w6*A
-            b.w7 = E*Ograd[6] + b.w7*A
-            b.w8 = E*Ograd[7] + b.w8*A
-            b.w9 = E*Ograd[8] + b.w9*A
-            b.w10 = E*Ograd[9] + b.w10*A
+            b.w0 = E*Od + b.w0*A
+            b.w1 = E*Od*H[0] + b.w1*A
+            b.w2 = E*Od*H[1] + b.w2*A
+            b.w3 = E*Od*H[2] + b.w3*A
+            b.w4 = E*Od*H[3] + b.w4*A
+            b.w5 = E*Od*H[4] + b.w5*A
+            b.w6 = E*Od*H[5] + b.w6*A
+            b.w7 = E*Od*H[6] + b.w7*A
+            b.w8 = E*Od*H[7] + b.w8*A
+            b.w9 = E*Od*H[8] + b.w9*A
+            b.w10 = E*Od*H[9] + b.w10*A
             b.save()
         else:
-            b.w0 = E*w.w0*Hd[w.id - 1] + b.w0*A
+            b.w0 = E*Hd[w.id - 1] + b.w0*A
             b.w1 = E*Hd[w.id - 1]*I.flg_contry_usr + b.w1*A
             b.w2 = E*Hd[w.id - 1]*I.flg_contry_card + b.w2*A
             b.w3 = E*Hd[w.id - 1]*I.flg_contry_lng + b.w3*A
@@ -92,12 +91,29 @@ def W_dW(I,H,Out):
 def training(n):
     for indx in range(int(n)):
         print('epoch:' + str(indx))
-        for I in DataSet.objects.all().order_by('id'):
-            print('iteration:' + str(I.id))
+        k = 0
+        sum_a = 0
+        sum_e = 0
+        sum_e2 = 0
+        for I in DataSet.objects.all().order_by('id'): #.filter(flg_fraud = 1)
             H = []
             Out = []
             start(I,H,Out)
-            W_dW(I,H,Out)
+            err = int((I.flg_fraud-Out[0])*(I.flg_fraud-Out[0])*100)
+            sum_a+=err
+            if err > 10:
+                W_dW(I,H,Out)
+                H = []
+                Out = []
+                start(I,H,Out)
+                err2 = int((I.flg_fraud-Out[0])*(I.flg_fraud-Out[0])*100)
+                print('iteration:' + str(I.id) + '(' + str(err) + ',' + str(err2) + ')')
+                sum_e+=err
+                sum_e2+=err2
+                k+=1
+            else:
+                print('iteration:' + str(I.id) + '(' + str(err) + ')')
+        print('errors:' + str(k) + ',' + str(int(sum_a/364)) + ',' + str(int(sum_e/k)) + ',' + str(int(sum_e2/k)))
     
 def resp(I):
     H = []
