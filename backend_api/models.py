@@ -53,3 +53,7 @@ class FraudScore(models.Model):
     flg_rep_tr = models.BooleanField()
     flg_bank_decl = models.BooleanField()
     flg_fraud = models.IntegerField(null=True, default=None)
+    
+class Log(models.Model):
+    EventDT = models.DateTimeField(auto_now_add=True)
+    log = models.TextField()

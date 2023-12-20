@@ -13,7 +13,6 @@ class GetFraudScore(APIView):
         fraudScore = None
         if serializer.is_valid(raise_exception=True):
             fraudScore = serializer.save()
-        print(fraudScore.id)
         fraudScore.flg_fraud = kernel.resp(fraudScore)
         fraudScore.save()
         output = {

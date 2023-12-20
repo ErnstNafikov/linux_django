@@ -90,7 +90,8 @@ def W_dW(I,H,Out):
 
 def training(n):
     for indx in range(int(n)):
-        print('epoch:' + str(indx))
+        new_log = Log(log = 'epoch:' + str(indx))
+        new_log.save()
         k = 0
         sum_a = 0
         sum_e = 0
@@ -107,13 +108,16 @@ def training(n):
                 Out = []
                 start(I,H,Out)
                 err2 = int((I.flg_fraud-Out[0])*(I.flg_fraud-Out[0])*100)
-                print('iteration:' + str(I.id) + '(' + str(err) + ',' + str(err2) + ')')
+                #new_log = Log(log = 'iteration:' + str(I.id) + '(' + str(err) + ',' + str(err2) + ')')
+                #new_log.save()
                 sum_e+=err
                 sum_e2+=err2
                 k+=1
             else:
-                print('iteration:' + str(I.id) + '(' + str(err) + ')')
-        print('errors:' + str(k) + ',' + str(int(sum_a/364)) + ',' + str(int(sum_e/k)) + ',' + str(int(sum_e2/k)))
+                new_log = Log(log = 'iteration:' + str(I.id) + '(' + str(err) + ')')
+                #new_log.save()
+        new_log = Log(log = 'errors:' + str(k) + ',' + str(int(sum_a/364)) + ',' + str(int(sum_e/k)) + ',' + str(int(sum_e2/k)))
+        new_log.save()
     
 def resp(I):
     H = []
